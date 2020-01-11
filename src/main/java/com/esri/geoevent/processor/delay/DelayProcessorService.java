@@ -7,21 +7,23 @@ import com.esri.ges.processor.GeoEventProcessorServiceBase;
 
 public class DelayProcessorService extends GeoEventProcessorServiceBase
 {
-    private Messaging messaging;
+  private Messaging messaging;
 
-    public DelayProcessorService()
-    {
-        this.definition = new DelayProcessorDefinition();
-    }
+  public DelayProcessorService()
+  {
+    this.definition = new DelayProcessorDefinition();
+  }
 
-    @Override
-    public GeoEventProcessor create() throws ComponentException {
-        DelayProcessor delayProcessor = new DelayProcessor(definition);
-        delayProcessor.setMessaging(messaging);
-        return delayProcessor;
-    }
+  @Override
+  public GeoEventProcessor create() throws ComponentException
+  {
+    DelayProcessor delayProcessor = new DelayProcessor(definition);
+    delayProcessor.setMessaging(messaging);
+    return delayProcessor;
+  }
 
-    public void setMessaging(Messaging messaging) {
-        this.messaging = messaging;
-    }
+  public void setMessaging(Messaging messaging)
+  {
+    this.messaging = messaging;
+  }
 }

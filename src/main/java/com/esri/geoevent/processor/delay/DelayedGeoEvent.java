@@ -1,32 +1,66 @@
 package com.esri.geoevent.processor.delay;
 
-import com.esri.ges.core.geoevent.GeoEvent;
-
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
 
-public class DelayedGeoEvent implements Delayed {
-    private final GeoEvent geoEvent;
-    private final long time;
+import com.esri.ges.core.geoevent.GeoEvent;
 
-    public DelayedGeoEvent(GeoEvent geoEvent, long delayTimeMs) {
-        this.geoEvent = geoEvent;
-        this.time = geoEvent.getReceivedTime().getTime() + delayTimeMs;
-    }
+public class DelayedGeoEvent implements Delayed
+{
+  private final GeoEvent geoEvent;
+  private final long     time;
+  private final boolean  useTrackID;
+  private final String   key;
 
-    @Override
-    public long getDelay(TimeUnit unit) {
-        long diff = this.time - System.currentTimeMillis();
-        return unit.convert(diff, TimeUnit.MILLISECONDS);
-    }
+  public DelayedGeoEvent(GeoEvent geoEvent, long delayTimeMs, String delayTimeField, boolean useTrackID)
+  {
+    this.geoEvent = geoEvent;
+    this.useTrackID = useTrackID;
 
-    @Override
-    public int compareTo(Delayed obj)
+    if (DelayProcessorDefinition.TIME_END.equals(delayTimeField))
+      this.time = geoEvent.getEndTime().getTime() + delayTimeMs;
+    else if (DelayProcessorDefinition.TIME_START.equals(delayTimeField))
+      this.time = geoEvent.getStartTime().getTime() + delayTimeMs;
+    else
+      this.time = geoEvent.getReceivedTime().getTime() + delayTimeMs;
+
+    if (useTrackID)
     {
-        return Long.compare(this.time, ((DelayedGeoEvent)obj).time);
+      // key must start with time to preserve queue time order
+      this.key = this.time + "_" + geoEvent.getTrackId();
+    }
+    else
+    {
+      this.key = Long.toString(time);
+    }
+  }
+
+  public String getKey()
+  {
+    return this.key;
+  }
+
+  @Override
+  public long getDelay(TimeUnit unit)
+  {
+    long diff = this.time - System.currentTimeMillis();
+    return unit.convert(diff, TimeUnit.MILLISECONDS);
+  }
+
+  @Override
+  public int compareTo(Delayed obj)
+  {
+    int result = Long.compare(this.time, ((DelayedGeoEvent) obj).time);
+    if (useTrackID)
+    {
+      result = this.key.compareTo(((DelayedGeoEvent) obj).key);
     }
 
-    public GeoEvent getGeoEvent() {
-        return this.geoEvent;
-    }
+    return result;
+  }
+
+  public GeoEvent getGeoEvent()
+  {
+    return this.geoEvent;
+  }
 }

@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
-	<bean id="delayProcessorServiceBean"
-		  class="com.esri.geoevent.processor.delay.DelayProcessorService"
-		  activation="eager">
-		<property name="bundleContext" ref="blueprintBundleContext" />
-		<property name="messaging" ref="messagingService" />
-	</bean>
-
-	<reference id="messagingService"
-			   interface="com.esri.ges.messaging.Messaging"/>
-
-	<service id="delayProcessorService"
-			 ref="delayProcessorServiceBean"
-			 interface="com.esri.ges.processor.GeoEventProcessorService"
-	/>
-
+  <bean id="delayProcessorServiceBean" class="com.esri.geoevent.processor.delay.DelayProcessorService" activation="eager">
+    <property name="bundleContext" ref="blueprintBundleContext" />
+    <property name="messaging" ref="messagingService" />
+  </bean>
+  <reference id="messagingService" interface="com.esri.ges.messaging.Messaging" />
+  <service id="delayProcessorService" ref="delayProcessorServiceBean" interface="com.esri.ges.processor.GeoEventProcessorService" />
 </blueprint>
